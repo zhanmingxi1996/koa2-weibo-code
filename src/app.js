@@ -8,12 +8,21 @@ const session = require('koa-generic-session')
 const redisStore = require('koa-redis')
 
 const { REDIS_CONF } = require('./conf/db.js')
+const { isProd } = require('../utils/env')
 
+// 导入路由
 const index = require('./routes/index')
 const users = require('./routes/users')
+const errorRouter = require('./routes/api/error')
 
 // error handler
-onerror(app)
+let onerrorConf = {}
+if (isProd) {
+  onerrorConf = {
+    redirect: '/error'
+  }
+}
+onerror(app, onerrorConf)
 
 // middlewares
 app.use(bodyparser({
@@ -50,6 +59,7 @@ app.use(async (ctx, next) => {
 // routes
 app.use(index.routes(), index.allowedMethods())
 app.use(users.routes(), users.allowedMethods())
+app.use(errorRouter.routes(), errorRouter.allowedMethods)
 
 // error-handling
 app.on('error', (err, ctx) => {
