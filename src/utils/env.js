@@ -12,4 +12,3 @@ module.exports = {
   isTest: ENV === 'test',
   notTest: ENV !== 'test'
 }
- 
